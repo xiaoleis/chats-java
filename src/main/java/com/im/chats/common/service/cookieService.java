@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 
 import com.im.chats.common.dao.SqlDao;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;

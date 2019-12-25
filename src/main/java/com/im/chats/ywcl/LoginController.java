@@ -36,7 +36,7 @@ public class LoginController {
      * @param password
      * @return
      */
-    @CrossOrigin   //解决前端收不到返回值的跨域问题
+    @CrossOrigin(allowCredentials = "true", allowedHeaders = "*")   //解决前端收不到返回值的跨域问题
     @RequestMapping("/login")
     public void login(@RequestParam(value = "name") String name, @RequestParam(value = "password") String password ,
                         HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -108,9 +108,10 @@ public class LoginController {
      * @param request
      * @param response
      */
-    @CrossOrigin
+    //@CrossOrigin(allowCredentials = "true", allowedHeaders = "*",origins="*")
     @RequestMapping("/tokenrz")
     public void tokenrz(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        System.out.println(cookieService.tokenyz(request).toJSONString());
         response.getWriter().write(cookieService.tokenyz(request).toJSONString());
     }
 
