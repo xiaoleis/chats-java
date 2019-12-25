@@ -28,10 +28,10 @@ public class MessageService {
             chatbs = UUID.randomUUID().toString().replace("-","");
             String cjhhsql = " insert into im_user_chats (chatbs,userid,hhdxid,hhdxlx) values (?,?,?,?) ";
             sqlDao.update(cjhhsql,new Object[]{chatbs,userid,hhdxid,"persion"});
-            sqlDao.update(cjmessagesql,new Object[]{chatbs,hhdxid,message,"text"});
+            sqlDao.update(cjmessagesql,new Object[]{chatbs,userid,message,"text"});
         }else{
             chatbs = chatlist.get(0).get("chatbs").toString();
-            sqlDao.update(cjmessagesql,new Object[]{chatbs,hhdxid,message,"text"});
+            sqlDao.update(cjmessagesql,new Object[]{chatbs,userid,message,"text"});
         }
         return "";
     }

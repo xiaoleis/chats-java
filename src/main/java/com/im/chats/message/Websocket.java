@@ -34,7 +34,7 @@ public class Websocket {
     private static int onlineCount = 0;
 
     //发送人员编号
-    private String userid = "";
+    private static String userid = "";
 
     private static ConcurrentHashMap<String,Websocket> websocketmap = new ConcurrentHashMap<String, Websocket>();
 
@@ -79,32 +79,36 @@ public class Websocket {
     /**
      * 服务器收到消息后转给指定用户或者群发
      * @param message
-     * @param session
      */
     @OnMessage
-    public void onMessage(String message,Session session){
+    public static void onMessage(String message){
         System.out.println("收到客户端的消息："+message);
-        //发送给指定用户
-        sendToUser(message);
+        if(!"start".equals(message)){
+            //发送给指定用户
+            sendToUser(message);
+        }
+
+
     }
 
     //@OnMessage
-    public void sendToUser(String message){
-        String senduserno = message.split("###")[0];
-        String sendmessage = message.split("###")[1];
-        try {
-            //如果该用户在线
-            if(websocketmap.get(senduserno) != null){
-                websocketmap.get(senduserno).sendMessage(new Date() + "@@@" + userid + "@@@" + sendmessage);
-                //将聊天记录到数据库中
-                String log =  messageService.saveMessage(senduserno,userid,sendmessage);
-            }else {
-                System.out.println(senduserno+"该用户不在线");
+    public static void sendToUser(String message){
+            String senduserno = message.split("###")[0];
+            String sendmessage = message.split("###")[1];
+            try {
+                //如果该用户在线
+                if(websocketmap.get(senduserno) != null){
+                    websocketmap.get(senduserno).sendMessage(new Date() + "@@@" + userid + "@@@" + sendmessage);
+                    //将聊天记录到数据库中
+                    String log =  messageService.saveMessage(senduserno,userid,sendmessage);
+                }else {
+                    System.out.println(senduserno+"该用户不在线");
+                }
+
+            }catch (Exception e){
+                e.printStackTrace();
             }
 
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     public void sendMessage(String message){

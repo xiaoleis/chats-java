@@ -34,7 +34,7 @@ public class ChatsController {
     @RequestMapping("/getChatsList")
     public void getChatsList(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject map  = cookieService.tokenyz(request);
-        cookieService.tokenyz(request);
+        //cookieService.tokenyz(request);
         //如果token认证成功，则读取会话列表
         if("1".equals(map.get("status").toString())){
             String userid = map.get("result").toString();
@@ -61,7 +61,41 @@ public class ChatsController {
         response.getWriter().write(map.toJSONString());
     }
 
-
+    /**
+     * 获取最近的聊天记录
+     * @param response
+     * @param request
+     */
+    @RequestMapping("/getMessagelist")
+    public void getMessageList(HttpServletResponse response, HttpServletRequest request) throws IOException {
+        JSONObject map = cookieService.tokenyz(request);
+        if("1".equals(map.get("status").toString())){
+            String hhdxid = request.getParameter("hhdxid");
+            String userid = map.get("result").toString();
+            String sql = "SELECT\n" +
+                            "  b.messagexh,\n" +
+                            "\ta.chatbs,\n" +
+                            "\ta.userid,\n" +
+                            "\ta.hhdxid,\n" +
+                            "\tb.senduserid,\n" +
+                            "\tb.type,\n" +
+                            "\tb.cjsj,\n" +
+                            "\tb.message\n" +
+                            "FROM\n" +
+                            "\tim_user_chats a\n" +
+                            "\tRIGHT JOIN im_chats_message b ON a.chatbs = b.chatbs \n" +
+                            "WHERE\n" +
+                            "\ta.userid = ? \n" +
+                            "\tAND a.hhdxid = ?\n" +
+                            "order by b.messagexh\n";
+            List<Map<String,Object>> list = sqlService.queryForList(sql,new Object[]{userid,hhdxid});
+            map.put("status","1");
+            map.put("result",list);
+        }
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("text/html;charset=utf-8");
+        response.getWriter().write(map.toJSONString());
+    }
 
 
 
