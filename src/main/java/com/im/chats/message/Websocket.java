@@ -99,7 +99,7 @@ public class Websocket {
                 //如果该用户在线
                 if(websocketmap.get(senduserno) != null){
                     websocketmap.get(senduserno).sendMessage(new Date() + "@@@" + userid + "@@@" + sendmessage);
-                    //将聊天记录到数据库中
+                    //将聊天记录到数据库中，生成会话
                     String log =  messageService.saveMessage(senduserno,userid,sendmessage);
                 }else {
                     System.out.println(senduserno+"该用户不在线");

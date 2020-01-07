@@ -20,10 +20,18 @@ public class MessageService {
             "(chatbs,senduserid,message,type,cjsj) values" +
             " (?,?,?,?,SYSDATE()) ";
 
+    /**
+     * 保存会话到数据库中
+     * @param userid
+     * @param hhdxid
+     * @param message
+     * @return
+     */
     public String saveMessage(String userid, String hhdxid, String message){
         String chatbs = "";
         List<Map<String,Object>> chatlist = sqlDao.queryForList(sqlchatbs,new Object[]{userid,hhdxid});
-        //如果该会话已存在
+        List<Map<String,Object>> chatlist1 = sqlDao.queryForList(sqlchatbs,new Object[]{hhdxid,userid});
+        //如果我的会话已存在
         if(chatlist.size() == 0){
             chatbs = UUID.randomUUID().toString().replace("-","");
             String cjhhsql = " insert into im_user_chats (chatbs,userid,hhdxid,hhdxlx) values (?,?,?,?) ";
@@ -33,6 +41,18 @@ public class MessageService {
             chatbs = chatlist.get(0).get("chatbs").toString();
             sqlDao.update(cjmessagesql,new Object[]{chatbs,userid,message,"text"});
         }
+
+        //如果多方的会话已存在
+        if(chatlist1.size() == 0){
+            chatbs = UUID.randomUUID().toString().replace("-","");
+            String cjhhsql = " insert into im_user_chats (chatbs,hhdxid,userid,,hhdxlx) values (?,?,?,?) ";
+            sqlDao.update(cjhhsql,new Object[]{chatbs,hhdxid,userid,"persion"});
+            sqlDao.update(cjmessagesql,new Object[]{chatbs,hhdxid,message,"text"});
+        }else{
+            chatbs = chatlist.get(0).get("chatbs").toString();
+            sqlDao.update(cjmessagesql,new Object[]{chatbs,hhdxid,message,"text"});
+        }
+
         return "";
     }
 

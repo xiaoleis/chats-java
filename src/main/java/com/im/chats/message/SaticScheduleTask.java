@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 @EnableScheduling
 public class SaticScheduleTask {
 
-    @Scheduled(fixedRate=55*1000)
+    @Scheduled(fixedRate=30*1000)
     private void configureTasks() throws Exception{
         Websocket.onMessage("start");
 

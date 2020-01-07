@@ -23,7 +23,7 @@ public class CorsConfig {
                         //放行哪些原始域(请求方式)
                         .allowedMethods("*")
                         //放行哪些原始域(头部信息)
-                        .allowedHeaders("*")
+                        .allowedHeaders("token")
                         //暴露哪些头部信息（因为跨域访问默认不能获取全部头部信息）
                         .exposedHeaders("token");
             }

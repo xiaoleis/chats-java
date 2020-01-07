@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
+import javax.naming.event.ObjectChangeListener;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -51,7 +53,8 @@ public class ChatsController {
                     "left join (\n" +
                     "\tselect chatbs,cjsj,message,type from im_chats_message where messagexh = (select max(messagexh) from im_chats_message) \n" +
                     ")ium on ium.chatbs = iuc.chatbs\n" +
-                    "where iuc.userid = ?";
+                    "where iuc.userid = ?" +
+                    " order by ium.cjsj desc";
             List<Map<String,Object>> chatlist = sqlService.queryForList(sql,new Object[]{userid});
             map.put("status","1");
             map.put("result",chatlist);
@@ -97,7 +100,68 @@ public class ChatsController {
         response.getWriter().write(map.toJSONString());
     }
 
+    /**
+     * 搜索用户添加用户
+     * @param request
+     * @param response
+     */
+    @RequestMapping("/sreachYh")
+    public void sreachYh(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JSONObject map  = cookieService.tokenyz(request);
+        if("1".equals(map.get("status"))){
+            String yhinfo = request.getParameter("yhinfo");
+            if(!"".equals(yhinfo)){
+                String sql = "select userid,loginame,Phone,nc from im_user\n" +
+                                " where " +
+                                "loginame like '%"+yhinfo+"%' " +
+                                "or Phone = '"+yhinfo+"'" +
+                                "or nc like '%"+yhinfo+"%' ";
+                List<Map<String, Object>> list = sqlService.queryForList(sql);
+                map.put("status","1");
+                map.put("result",list);
+            }
+        }
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("text/html;charset=utf-8");
+        response.getWriter().write(map.toJSONString());
+    }
 
+
+    /**
+     * 删除会话
+     * @param request
+     * @param response
+     */
+    public void delHh(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JSONObject tokenmap  = cookieService.tokenyz(request);
+        try{
+
+
+        if("1".equals(tokenmap.get("status"))){
+            String userid = tokenmap.get("result").toString();
+            String hhdxid = request.getParameter("hhdxid");
+            if(!"".equals(userid) && !"".equals(hhdxid)){
+                String cxchatbsql = "select chatbs from im_user_chats\n" +
+                        "where userid = ? and hhdxid = ?";
+                String chatbs = sqlService.queryForMap(cxchatbsql,new Object[]{userid,hhdxid}).get("chatbs").toString();
+                if(!"".equals(chatbs)){
+                    //删除历史消息
+                    sqlService.update("delete from im_chats_message where chatbs = ? ",new Object[]{chatbs});
+                    //删除会话
+                    sqlService.update("delete from im_user_chats where chatbs = ?",new Object[]{chatbs});
+                    tokenmap.put("status","1");
+                    tokenmap.put("result","删除会话成功");
+                }
+            }
+        }
+        }catch (Exception e){
+            tokenmap.put("status","0");
+            tokenmap.put("result","服务器错误");
+        }
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("text/html;charset=utf-8");
+        response.getWriter().write(tokenmap.toJSONString());
+    }
 
 
 }
